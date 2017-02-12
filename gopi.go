@@ -4,7 +4,7 @@ import (
   "net/http"
   "fmt"
 )
-type ReqResFunc func(*http.Request) string
+type ReqResFunc func(http.ResponseWriter, *http.Request) string
 type NetHttpHandleFunc func(w http.ResponseWriter, r *http.Request)
 
 // Base struct
@@ -28,7 +28,7 @@ func (this *Router) HandleRoute(path string, f ReqResFunc) {
 
 func (this *Router) assignRouteToHttp(f ReqResFunc) NetHttpHandleFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
-			s := f(r)
+			s := f(rw, r)
 			fmt.Fprintf(rw, s)
 	}
 }
@@ -41,6 +41,6 @@ func (this *Router) ListenAndServe(addr string) {
 // Call the appropriate handler function, provided a request.
 // Used in testing
 func (this *Router) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
-  s := this.routes[r.URL.Path](r)
+  s := this.routes[r.URL.Path](rw, r)
   fmt.Fprintf(rw, s)
 }
